@@ -1,0 +1,74 @@
+swagger: '2.0'
+info:
+  title: Restaurant Recommendation AI Service API
+  description: 'AI Customer Service application to build a restaurant recommendation chatbot service'
+  version: 1.0.0
+schemes:
+  - https
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /reply:
+    get:
+      summary: API to get reply for a sentence collected from client.
+      description: |
+        This API takes in one message from the client and returns
+        one or more messages as a response. The API leverages the NLP
+        backend functionality, paired with state and profile information
+        and returns a context-aware reply.
+      tags:
+        - Chatbot
+      operationId: sendMessage
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/MessageRequest'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/MessageResponse'
+        '403':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/MessageResponse'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/MessageResponse'
+
+definitions:
+  BaseResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+      info:
+        type: string
+      timestamp:
+        type: string
+        format: MM/DD/YYYY
+
+  MessageRequest:
+    type: object
+    properties:
+      message:
+        type: string
+      timestamp:
+        type: string
+        format: MM/DD/YYYY
+
+  MessageResponse:
+    type: object
+    properties:
+      messages:
+        type: array
+        items:
+          type: string
+      status:
+        $ref: '#/definitions/BaseResponse'
