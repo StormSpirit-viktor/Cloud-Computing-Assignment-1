@@ -46,13 +46,8 @@ definitions:
   BaseResponse:
     type: object
     properties:
-      code:
-        type: integer
       info:
         type: string
-      timestamp:
-        type: string
-        format: MM/DD/YYYY
 
   MessageRequest:
     type: object
