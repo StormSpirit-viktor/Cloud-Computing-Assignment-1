@@ -24,12 +24,13 @@ function setDate(){
   }
 }
 
+// insert message when click send button
 function insertMessage() {
-  msg = $('.message-input').val();
-  if ($.trim(msg) == '') {
+  msg = $('.message-input').val();        // get input text
+  if ($.trim(msg) == '') {                // see if text is empty
     return false;
   }
-  $('<div class="message message-personal">' + msg + '</div>').appendTo($('.mCSB_container')).addClass('new');
+  $('<div class="message message-personal">' + msg + '</div>').appendTo($('.mCSB_container')).addClass('new');   // output user text
   setDate();
   $('.message-input').val(null);
   updateScrollbar();
@@ -49,37 +50,34 @@ $(window).on('keydown', function(e) {
   }
 })
 
-var Fake = [
-  'Hi there, I\'m Fabio and you?',
-  'Nice to meet you',
-  'How are you?',
-  'Not too bad, thanks',
-  'What do you do?',
-  'That\'s awesome',
-  'Codepen is a nice place to stay',
-  'I think you\'re a nice person',
-  'Why do you think that?',
-  'Can you explain?',
-  'Anyway I\'ve gotta go now',
-  'It was a pleasure chat with you',
-  'Time to make a new codepen',
-  'Bye',
-  ':)'
-]
+var fake_message = "Wait for a good API";
+
+function getBotRespond() {
+  var data = null;
+  $.ajax({
+    type: 'GET',
+    url: 'https://o3nlpcvyki.execute-api.us-east-2.amazonaws.com/default/chat-bot-reply',
+
+    success: function (response) {
+      data = response;
+      console.log(data)
+    }
+  });
+  return data
+}
 
 function fakeMessage() {
   if ($('.message-input').val() != '') {
     return false;
   }
-  $('<div class="message loading new"><figure class="avatar"><img src="./turtle.jpg" /></figure><span></span></div>').appendTo($('.mCSB_container'));
+  $('<div class="message loading new"><figure class="avatar"><img src="./turtle.jpg /></figure><span></span></div>').appendTo($('.mCSB_container'));
   updateScrollbar();
 
   setTimeout(function() {
     $('.message.loading').remove();
-    $('<div class="message new"><figure class="avatar"><img src="./turtle.jpg" /></figure>' + Fake[i] + '</div>').appendTo($('.mCSB_container')).addClass('new');
+    $('<div class="message new"><figure class="avatar"><img src="./turtle.jpg" /></figure>' + getBotRespond() + '</div>').appendTo($('.mCSB_container')).addClass('new');
     setDate();
     updateScrollbar();
-    i++;
   }, 1000 + (Math.random() * 20) * 100);
 
 }
