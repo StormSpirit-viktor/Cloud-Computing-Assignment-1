@@ -75,8 +75,8 @@ def send_to_user(restaurant_infos, credentials, cuisines, phones):
     
     client = boto3.client(
         "sns",
-        aws_access_key_id="AKIAJ2QJ7LKWRXF5ANOQ",
-        aws_secret_access_key="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",
+        aws_access_key_id="*****",
+        aws_secret_access_key="******",
         region_name="us-east-1"
     )
     
