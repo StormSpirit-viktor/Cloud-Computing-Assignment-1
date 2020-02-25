@@ -24,6 +24,12 @@ def lambda_handler(event, context):
     
     response = requests.get('https://6xe9a45bt1.execute-api.us-east-1.amazonaws.com/v1/chatbot')
     dics = json.loads(response.text)
+    
+    l = len(dics)
+    
+    more_info_list = []
+    query_list = []
+    phone_list = []
     for dic_ in dics:
         dic = json.loads(dic_)
         
@@ -44,41 +50,50 @@ def lambda_handler(event, context):
         interact with dynamodb to get full information of restaurants
         """
         dynamodb = boto3.client('dynamodb',
-                                  aws_access_key_id='******',
-                                  aws_secret_access_key='*****',
+                                  aws_access_key_id='AKIAX2B7KX4ZLA7J7PGW',
+                                  aws_secret_access_key='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',
                                   region_name="us-east-1")
         more_info = dynamodb.get_item(TableName='yelp-restaurants', Key={'Business_ID': {'S': candidates[0]}})
         more_info = more_info.get('Item', None)
+        
         if more_info is not None:
-            send_to_user(more_info, credentials, query, phone)
+            more_info_list.append(more_info)
+            query_list.append(query)
+            phone_list.append(phone)
+            #send_to_user(more_info, credentials, query, phone)
+    
+    send_to_user(more_info_list, credentials, query_list, phone_list)        
     
     return {
         'statusCode': 200,
         'body': json.dumps('Hello from Lambda!'),
-
+        'sqs num' : l,
     }
 
 
-def send_to_user(restaurant_info, credentials, cuisine, phone):
+def send_to_user(restaurant_infos, credentials, cuisines, phones):
+    
     client = boto3.client(
         "sns",
-        aws_access_key_id="******",
-        aws_secret_access_key="*****",
+        aws_access_key_id="AKIAJ2QJ7LKWRXF5ANOQ",
+        aws_secret_access_key="uCORLbXvXSemfBUqd0DWPpPmhVU4FH8qck45HHw2",
         region_name="us-east-1"
     )
-
-    # Send your sms message.
+    
+    for i, phone in enumerate(phones):
+        try:
+            response = client.publish(
+                PhoneNumber=phone,
+                Message=format_message(cuisines[i], restaurant_infos[i])
+            )
+        except ClientError as e:
+            print(e.response['Error']['Message'])
+        
+    
+    
+def format_message(cuisine, restaurant_info):
     message = 'Hello. Do you want to have {}? This is your recommendation! The restaurant name is {}'.format(cuisine, restaurant_info['Name']['S'])
     message += '. The address is {}'.format(restaurant_info['Address']['S'])
     message += ". This restaurant has {} reviews and the average rating is {}".format(restaurant_info['Number_of_review']['N'], restaurant_info['Rating']['N'])
     message += ". Accurate location latitude is {} longitude is {}. Zip code is {}. Enjoy your meal!".format(restaurant_info["Coordinates"]["M"]["latitude"]['N'], restaurant_info["Coordinates"]["M"]["longitude"]['N'], restaurant_info["Zip_Code"]['S'])
-    
-    
-    try:
-        response = client.publish(
-            PhoneNumber=phone,
-            Message=message
-        )
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    
+    return message
