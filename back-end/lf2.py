@@ -50,8 +50,8 @@ def lambda_handler(event, context):
         interact with dynamodb to get full information of restaurants
         """
         dynamodb = boto3.client('dynamodb',
-                                  aws_access_key_id='AKIAX2B7KX4ZLA7J7PGW',
-                                  aws_secret_access_key='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',
+                                  aws_access_key_id='****',
+                                  aws_secret_access_key='****',
                                   region_name="us-east-1")
         more_info = dynamodb.get_item(TableName='yelp-restaurants', Key={'Business_ID': {'S': candidates[0]}})
         more_info = more_info.get('Item', None)
