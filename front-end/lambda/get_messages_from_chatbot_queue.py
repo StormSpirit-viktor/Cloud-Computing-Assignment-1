@@ -1,6 +1,7 @@
 import boto3
 import traceback
 
+max_message_len = 10
 
 class SQS(object):
     def __init__(self, name):
@@ -19,7 +20,7 @@ class SQS(object):
 
     def get_messages(self):
         ret = []
-        for message in self.queue.receive_messages():
+        for message in self.queue.receive_messages(MaxNumberOfMessages=max_message_len):
             ret.append(message.body)
             message.delete()
         return ret
